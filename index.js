@@ -68,4 +68,4 @@ app.use((err, req, res, next) => {
 const port = process.env.port || 5000;
 console.log('This is the port - %d', port);
 const host = '0.0.0.0';
-app.listen(port, host,  ()=> console.log(`listening to ${port}`));
+app.listen(port,  ()=> console.log(`listening to ${port}`));
