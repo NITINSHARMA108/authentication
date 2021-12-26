@@ -1,0 +1,10 @@
+<% if (typeof(error) != 'undefined'){ %>
+    <% error.forEach(e=>{ %>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <%= e %> 
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+    <% }) %> 
+<% } %> 

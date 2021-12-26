@@ -4,6 +4,10 @@ const session = require('express-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const cookieParse = require('cookie-parser');
+const bodyParser  =require('body-parser');
+const User = require('./models/User');
+const flash = require('connect-flash');
 require('dotenv').config();
 // database connection
 const mongoDb = process.env.CONNECTION;
@@ -16,6 +20,7 @@ db.on('error', console.error.bind(console, 'mongo connection error'));
 
 // setting up view engine
 const app = express();
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 const routes = require('./routes/index');
@@ -26,27 +31,34 @@ app.use(express.json());
 
 app.use(
   session({
-    secret: 'session storage tutorial',
-    resave: false,
+    secret: 'session_storage_tutorial',
+    resave: true,
     saveUninitialized: true,
     cookie: {
-      _expires: 1000 * 60 * 60 * 24,
-      originalMaxAge: 1000 * 60 * 60 * 24,
-    },
+      maxAge: Date.now() + 864000
+    }
   })
 );
-require('./config/passport.js');
+app.use(flash());
+require('./config/passport.js')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
-app.use(function (req, res, next) {
-  res.locals.currentUser = req.user;
-  next();
+
+passport.serializeUser( function(user, done){
+  done(null,user.id);
+})
+passport.deserializeUser( function (id, done) {
+  User.findById(id, function (err, user) {
+    done(err, user);
+  });
 });
 
-app.use((req, res, next) => {
-  next();
+app.use(function (err, req, res, next) {
+  res.locals.currentUser = req.user;
+  
+  next(err);
 });
 
 app.use('/', routes);

@@ -20,16 +20,27 @@ exports.signup_post = [
   (req, res, next) => {
     console.log(req.body);
     const errors = validationResult(req);
-    console.log(errors);
     if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
+      let error=[]
+      errors['errors'].forEach((e)=>{
+        
+        error.push(e.msg);
+      })
+      res.render('signup_form',{ error: error });
     }
+    else{
     bcrypt.genSalt(10, function (err, salt) {
       bcrypt.hash(req.body.password, salt, async function (err, hash) {
         if (err) {
           res.redirect('/error');
         }
+        let error = [];
         let isAdmin = false;
+        const username = await User.findOne({username: req.body.username});
+        if(username){
+          error.push('username is not available');
+          res.render('signup_form', {error});
+        }
         if (req.body.isadmin === 'on') {
           isAdmin = true;
         }
@@ -40,19 +51,22 @@ exports.signup_post = [
           isAdmin: isAdmin,
         });
         if (!response) {
-          res.redirect('/error');
+          error.push('Unable to create user');
+          res.render('signup_form', {error});
         } else {
-          res.redirect('/login');
+          res.render('login_form');
         }
       });
     });
     /* bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
       
     });*/
-  },
+  }
+},
 ];
 
 exports.login_get = (req, res, next) => {
+  
   if (req.isAuthenticated()) {
     res.redirect('/messages');
   } else {
@@ -60,27 +74,38 @@ exports.login_get = (req, res, next) => {
   }
 };
 
-exports.login_post = (req, res, next) => {};
+exports.login_post = (req, res, next) => {
+  res.redirect('/messages');
+
+};
 
 exports.get_user_membership = (req, res, next) => {
   if (req.isAuthenticated()) {
     res.render('secret_passcode', { title: 'Join Membership' });
   } else {
-    res.render('login_form');
+    res.render('login_form', {error: ['session timed out']});
   }
 };
 exports.post_user_membership = async (req, res, next) => {
   const { passcode } = req.body;
-  if (passcode === '325476') {
-    const response = await User.findOneAndUpdate(req.user._id, {
-      membership_status: true,
-    });
+  console.log(passcode);
+  console.log(req.session);
+  console.log(req.user);
+  if (passcode == '325476') {
+    const response = await User.findByIdAndUpdate(req.user._id,{
+      membership_status: true
+    })
+
+    console.log(response);
     if (!response) {
+      
       next();
     } else {
+      
       res.redirect('/messages');
     }
   } else {
+    
     res.redirect('/messages');
   }
 };
@@ -90,6 +115,6 @@ exports.logout = (req, res, next) => {
     req.logout();
     res.redirect('/login');
   } else {
-    next('session timed out');
+    res.render('login_form', {error: ['session timed out']});
   }
 };
