@@ -66,6 +66,6 @@ app.use((err, req, res, next) => {
   res.render('error', { error: err });
 });
 const port = process.env.PORT || 5000;
-console.log('This is the port - %d', port);
+console.log('This is the port', port);
 
 app.listen(port,  ()=> console.log(`listening to ${port}`));
