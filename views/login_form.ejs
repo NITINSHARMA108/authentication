@@ -17,9 +17,14 @@
     <div class="container">
       <div class="row">
         <div class="col-12 col-sm-8 col-md-6">
-          <form method="POST" action="/login" class="mt-4" onsubmit="return login()">
+          <form
+            method="POST"
+            action="/login"
+            class="mt-4"
+            onsubmit="return login()"
+          >
             <h2>Log In</h2>
-            <%- include('./partials/error_messages.ejs') %> 
+            <%- include('./partials/error_messages.ejs') %>
             <div class="form-group">
               <label>Username</label>
               <input

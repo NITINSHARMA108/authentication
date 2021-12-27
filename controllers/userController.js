@@ -21,52 +21,49 @@ exports.signup_post = [
     console.log(req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      let error=[]
-      errors['errors'].forEach((e)=>{
-        
+      let error = [];
+      errors['errors'].forEach((e) => {
         error.push(e.msg);
-      })
-      res.render('signup_form',{ error: error });
-    }
-    else{
-    bcrypt.genSalt(10, function (err, salt) {
-      bcrypt.hash(req.body.password, salt, async function (err, hash) {
-        if (err) {
-          res.redirect('/error');
-        }
-        let error = [];
-        let isAdmin = false;
-        const username = await User.findOne({username: req.body.username});
-        if(username){
-          error.push('username is not available');
-          res.render('signup_form', {error});
-        }
-        if (req.body.isadmin === 'on') {
-          isAdmin = true;
-        }
-        const response = await User.create({
-          username: req.body.username,
-          full_name: req.body.name,
-          password: hash,
-          isAdmin: isAdmin,
-        });
-        if (!response) {
-          error.push('Unable to create user');
-          res.render('signup_form', {error});
-        } else {
-          res.render('login_form');
-        }
       });
-    });
-    /* bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
+      res.render('signup_form', { error: error });
+    } else {
+      bcrypt.genSalt(10, function (err, salt) {
+        bcrypt.hash(req.body.password, salt, async function (err, hash) {
+          if (err) {
+            res.redirect('/error');
+          }
+          let error = [];
+          let isAdmin = false;
+          const username = await User.findOne({ username: req.body.username });
+          if (username) {
+            error.push('username is not available');
+            res.render('signup_form', { error });
+          }
+          if (req.body.isadmin === 'on') {
+            isAdmin = true;
+          }
+          const response = await User.create({
+            username: req.body.username,
+            full_name: req.body.name,
+            password: hash,
+            isAdmin: isAdmin,
+          });
+          if (!response) {
+            error.push('Unable to create user');
+            res.render('signup_form', { error });
+          } else {
+            res.render('login_form');
+          }
+        });
+      });
+      /* bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
       
     });*/
-  }
-},
+    }
+  },
 ];
 
 exports.login_get = (req, res, next) => {
-  
   if (req.isAuthenticated()) {
     res.redirect('/messages');
   } else {
@@ -76,14 +73,13 @@ exports.login_get = (req, res, next) => {
 
 exports.login_post = (req, res, next) => {
   res.redirect('/messages');
-
 };
 
 exports.get_user_membership = (req, res, next) => {
   if (req.isAuthenticated()) {
     res.render('secret_passcode', { title: 'Join Membership' });
   } else {
-    res.render('login_form', {error: ['session timed out']});
+    res.render('login_form', { error: ['session timed out'] });
   }
 };
 exports.post_user_membership = async (req, res, next) => {
@@ -92,20 +88,17 @@ exports.post_user_membership = async (req, res, next) => {
   console.log(req.session);
   console.log(req.user);
   if (passcode == '325476') {
-    const response = await User.findByIdAndUpdate(req.user._id,{
-      membership_status: true
-    })
+    const response = await User.findByIdAndUpdate(req.user._id, {
+      membership_status: true,
+    });
 
     console.log(response);
     if (!response) {
-      
       next();
     } else {
-      
       res.redirect('/messages');
     }
   } else {
-    
     res.redirect('/messages');
   }
 };
@@ -115,6 +108,6 @@ exports.logout = (req, res, next) => {
     req.logout();
     res.redirect('/login');
   } else {
-    res.render('login_form', {error: ['session timed out']});
+    res.render('login_form', { error: ['session timed out'] });
   }
 };

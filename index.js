@@ -65,7 +65,7 @@ app.use('/', routes);
 app.use((err, req, res, next) => {
   res.render('error', { error: err });
 });
-const port = process.env.port || 5000;
+const port = process.env.PORT || 5000;
 console.log('This is the port - %d', port);
-const host = '0.0.0.0';
+
 app.listen(port,  ()=> console.log(`listening to ${port}`));

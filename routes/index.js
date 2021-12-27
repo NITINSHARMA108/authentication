@@ -20,7 +20,10 @@ router.get('/login', userController.login_get);
 
 router.post(
   '/login',
-  passport.authenticate('local', { failureRedirect: '/login', failureFlash: true}),
+  passport.authenticate('local', {
+    failureRedirect: '/login',
+    failureFlash: true,
+  }),
   userController.login_post
 );
 

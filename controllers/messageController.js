@@ -2,29 +2,24 @@ const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
 const Message = require('../models/Message');
 
-
 exports.redirect = (req, res, next) => {
   if (req.isAuthenticated()) {
     res.redirect('/messages');
   } else {
-    
     res.render('login_form');
   }
 };
 
-exports.get_messages = async ( req, res, next) => {
+exports.get_messages = async (req, res, next) => {
   const response = await Message.find({});
   if (req.isAuthenticated()) {
-    
     if (!response) {
-      
-      res.render('index', { error: ['Unable to fetch database']});
-      
+      res.render('index', { error: ['Unable to fetch database'] });
     } else {
       res.render('index', { messages: response, user: req.user });
     }
   } else {
-    res.render('login_form', {error: ['Session Time Out']});
+    res.render('login_form', { error: ['Session Time Out'] });
   }
 };
 
@@ -32,7 +27,7 @@ exports.get_create_message = (req, res, next) => {
   if (req.isAuthenticated()) {
     res.render('create_message');
   } else {
-    res.render('login_form', {error: ['Session Time Out']});
+    res.render('login_form', { error: ['Session Time Out'] });
   }
 };
 
@@ -52,7 +47,7 @@ exports.post_create_message = [
         author_name: req.user.full_name,
       });
       if (!response) {
-        res.render('login_form', {error: ['Session Time Out']});
+        res.render('login_form', { error: ['Session Time Out'] });
       } else {
         res.redirect('/messages');
       }
@@ -70,6 +65,6 @@ exports.delete_message = async (req, res, next) => {
       res.redirect('/messages');
     }
   } else {
-    res.render('login_form', {error: ['Session Time Out']})
+    res.render('login_form', { error: ['Session Time Out'] });
   }
 };
